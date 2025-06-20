@@ -113,8 +113,7 @@ Potential improvements for the weather app:
 
 **Developer**: Abhiram Reddy Alugula  
 **Email**: abhiramreddialugula@gmail.com  
-**Location**: Stillwater, Oklahoma, USA  
-**Project**: Student Portfolio Weather Application
+**Project**: Weather Application
 
 ## 📄 License
 
