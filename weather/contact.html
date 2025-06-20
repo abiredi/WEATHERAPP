@@ -1,8 +1,155 @@
-<h1>Contact Me</h1>
-<p>Email: abhiramreddialugula@gmail.com </p>
-<p>Address:</p>
-<p>
-  317 S Duck street, Apt 1 <br />
-  Stillwater<br />
-  OK, USA <br />
-</p>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact - Weather App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    .contact-card {
+      transition: transform 0.3s ease;
+    }
+    .contact-card:hover {
+      transform: translateY(-5px);
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: #0d6efd !important;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="bi bi-cloud-sun-fill me-2"></i>Weather App
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <i class="bi bi-house-fill me-1"></i>Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html#about">
+              <i class="bi bi-info-circle me-1"></i>About This App
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">
+              <i class="bi bi-envelope me-1"></i>Contact
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card contact-card shadow">
+          <div class="card-header">
+            <h2 class="text-center mb-0">
+              <i class="bi bi-envelope-fill me-2"></i>Contact Information
+            </h2>
+          </div>
+          <div class="card-body p-5">
+            <div class="row">
+              <div class="col-md-6">
+                <h4 class="text-primary mb-4">
+                  <i class="bi bi-person-circle me-2"></i>Developer Details
+                </h4>
+                <div class="mb-3">
+                  <h6><i class="bi bi-person me-2"></i>Name:</h6>
+                  <p class="text-muted">Abhiram Reddy Alugula</p>
+                </div>
+                <div class="mb-3">
+                  <h6><i class="bi bi-envelope me-2"></i>Email:</h6>
+                  <p class="text-muted">
+                    <a href="mailto:abhiramreddialugula@gmail.com" class="text-decoration-none">
+                      abhiramreddialugula@gmail.com
+                    </a>
+                  </p>
+                </div>
+                <div class="mb-3">
+                  <h6><i class="bi bi-geo-alt me-2"></i>Location:</h6>
+                  <p class="text-muted">Stillwater, Oklahoma, USA</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h4 class="text-primary mb-4">
+                  <i class="bi bi-geo-alt-fill me-2"></i>Address
+                </h4>
+                <div class="mb-3">
+                  <p class="text-muted">
+                    <i class="bi bi-house me-2"></i>317 S Duck Street, Apt 1<br>
+                    Stillwater, OK 74074<br>
+                    United States
+                  </p>
+                </div>
+                <div class="mb-3">
+                  <h6><i class="bi bi-calendar me-2"></i>Project:</h6>
+                  <p class="text-muted">Weather App - Student Portfolio Project</p>
+                </div>
+                <div class="mb-3">
+                  <h6><i class="bi bi-code-slash me-2"></i>Technologies:</h6>
+                  <p class="text-muted">HTML, CSS, JavaScript, Bootstrap</p>
+                </div>
+              </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+              <h5 class="text-primary mb-3">
+                <i class="bi bi-chat-dots me-2"></i>Get in Touch
+              </h5>
+              <p class="text-muted mb-4">
+                Feel free to reach out for any questions about this weather application, 
+                collaboration opportunities, or just to say hello!
+              </p>
+              <div class="d-flex justify-content-center gap-3">
+                <a href="mailto:abhiramreddialugula@gmail.com" class="btn btn-primary">
+                  <i class="bi bi-envelope me-2"></i>Send Email
+                </a>
+                <a href="index.html" class="btn btn-outline-secondary">
+                  <i class="bi bi-arrow-left me-2"></i>Back to Weather App
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-light text-center py-4 mt-5">
+    <div class="container">
+      <p>&copy; 2024 Weather App. Built with HTML, CSS, and JavaScript.</p>
+      <p>Powered by Weather API Ninjas</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"></script>
+  
+</body>
+
+</html>

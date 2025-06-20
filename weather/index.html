@@ -4,16 +4,98 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> My Weather APP </title>
+  <title>Weather App - Real-time Weather Information</title>
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌤️</text></svg>">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    .weather-card {
+      transition: all 0.3s ease;
+    }
+    .weather-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .loading-spinner {
+      display: none;
+    }
+    .error-message {
+      display: none;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .info-message {
+      display: none;
+      background-color: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .navbar-brand {
+      font-weight: bold;
+      color: #0d6efd !important;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+    }
+    .table-responsive {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .table th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .btn-outline-primary:hover {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+    }
+    .suggestion-badge {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .suggestion-badge:hover {
+      transform: scale(1.1);
+      background-color: #0d6efd !important;
+      color: white !important;
+    }
+    .autocomplete-items div:hover {
+      background-color: #e9ecef;
+    }
+    .table tbody tr {
+      transition: all 0.3s ease;
+    }
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+      transform: scale(1.01);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Weather App</a>
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-cloud-sun-fill me-2"></i>Weather App
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -21,183 +103,288 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link active" aria-current="page" href="#">
+              <i class="bi bi-house-fill me-1"></i>Home
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">About This App</a>
+            <a class="nav-link" href="#about">
+              <i class="bi bi-info-circle me-1"></i>About This App
+            </a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-
+              <i class="bi bi-geo-alt me-1"></i>Quick Cities (<span id="cityCount">4</span>)
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Oklahoma</a></li>
-              <li><a class="dropdown-item" href="#"> California</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="#"> New York</a></li>
+              <!-- Dynamic cities will be loaded here -->
             </ul>
-
           </li>
           <li class="nav-item">
-            <a class="nav-link">Usage Guide</a>
+            <a class="nav-link" href="#guide">
+              <i class="bi bi-question-circle me-1"></i>Usage Guide
+            </a>
           </li>
         </ul>
-        <form class="d-flex" role="search">
-          <input id="city" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit" id="submit">Search</button>
-        </form>
+        <div class="d-flex align-items-center">
+          <div class="me-3 text-muted">
+            <i class="bi bi-clock me-1"></i>
+            <span id="currentTime">--:--:--</span>
+          </div>
+          <button class="btn btn-outline-success me-2" onclick="initializeWithCurrentLocation()" title="Get weather for my current location" id="locationBtn">
+            <i class="bi bi-geo-alt-fill"></i> My Location
+          </button>
+          <form class="d-flex" role="search">
+            <input id="city" class="form-control me-2" type="search" placeholder="Enter city name..." aria-label="Search">
+            <button class="btn btn-outline-primary" type="submit" id="submit">
+              <i class="bi bi-search"></i> Search
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </nav>
 
+  <div class="container mt-4">
+    <!-- Loading Spinner -->
+    <div id="loading" class="text-center loading-spinner">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Fetching weather data...</p>
+    </div>
 
-  <div class="container">
-     
-    <h1 class="my-4 text-center">Weather for <span id="cityName"></span></h1>
+    <!-- Error Message -->
+    <div id="error" class="error-message"></div>
+
+    <!-- Info Message -->
+    <div id="info" class="info-message"></div>
+
+    <!-- Location Instructions -->
+    <div id="locationInstructions" class="alert alert-info" style="display: none;">
+      <h6><i class="bi bi-info-circle me-2"></i>Location Detection Help</h6>
+      <p class="mb-2">To get weather for your current location:</p>
+      <ul class="mb-2">
+        <li>Click "My Location" button in the navigation</li>
+        <li>Allow location access when your browser asks</li>
+        <li>If location is blocked, the app will try IP-based detection</li>
+        <li>You can also manually search for your city</li>
+      </ul>
+      <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('locationInstructions').style.display='none'">
+        Got it!
+      </button>
+    </div>
+
+    <!-- Main Weather Display -->
+    <h1 class="my-4 text-center">
+      <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+      Weather for <span id="cityName" class="text-primary fw-bold">Delhi</span>
+    </h1>
+    
+    <!-- City Suggestions -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-lightbulb me-2"></i>Popular Cities - Click to Search
+            </h5>
+          </div>
+          <div class="card-body">
+            <div id="citySuggestions" class="d-flex flex-wrap">
+              <!-- Dynamic city suggestions will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <main>
-      <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="row row-cols-1 row-cols-md-3 mb-4 text-center">
         <div class="col">
-          <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card mb-4 rounded-3 shadow-sm weather-card h-100">
             <div class="card-header py-3">
-              <h4 class="my-0 fw-normal">Temperatures</h4>
+              <h4 class="my-0 fw-normal">
+                <i class="bi bi-thermometer-half me-2"></i>Temperatures
+              </h4>
             </div>
-            <div class="card-body">
-              <h1 class="card-title pricing-card-title"> <span id="temp2"></span> <small class="text-body-secondary fw-light">   <span>&#8451;</span></small></h1>
-              <ul class="list-unstyled mt-3 mb-4">
-                <li>Temperature is <span id="temp"></span></li>
-                <li>Min Temperature is <span id="min_temp"></span></li>
-                <li>Max Temperature is <span id="max_temp"></span></li>
-                
+            <div class="card-body d-flex flex-column">
+              <h1 class="card-title pricing-card-title">
+                <span id="temp2">--</span> 
+                <small class="text-body-secondary fw-light">°C</small>
+              </h1>
+              <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                <li><i class="bi bi-thermometer me-2"></i>Current: <span id="temp">--</span>°C</li>
+                <li><i class="bi bi-thermometer-low me-2"></i>Min: <span id="min_temp">--</span>°C</li>
+                <li><i class="bi bi-thermometer-high me-2"></i>Max: <span id="max_temp">--</span>°C</li>
               </ul>
-              <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>
+              <button type="button" class="w-100 btn btn-lg btn-outline-primary">
+                <i class="bi bi-download me-2"></i>Get Details
+              </button>
             </div>
           </div>
         </div>
         <div class="col">
-          <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card mb-4 rounded-3 shadow-sm weather-card h-100">
             <div class="card-header py-3">
-              <h4 class="my-0 fw-normal">Humidity Info</h4>
+              <h4 class="my-0 fw-normal">
+                <i class="bi bi-droplet-fill me-2"></i>Humidity Info
+              </h4>
             </div>
-            <div class="card-body">
-              <h1 class="card-title pricing-card-title"><span id="humidity2"></span><small class="text-body-secondary fw-light"><span>&#37;</span></small></h1>
-              <ul class="list-unstyled mt-3 mb-4">
-                <li>Wind Degree is <span id="wind_degrees"></span></li>
-                <li>feels Like PCT is <span id="feels_like"></span></li>
-                <li>Humidity is <span id="humidity"></span></li>
-
+            <div class="card-body d-flex flex-column">
+              <h1 class="card-title pricing-card-title">
+                <span id="humidity2">--</span>
+                <small class="text-body-secondary fw-light">%</small>
+              </h1>
+              <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                <li><i class="bi bi-compass me-2"></i>Wind Direction: <span id="wind_degrees">--</span>°</li>
+                <li><i class="bi bi-thermometer-sun me-2"></i>Feels Like: <span id="feels_like">--</span>°C</li>
+                <li><i class="bi bi-droplet me-2"></i>Humidity: <span id="humidity">--</span>%</li>
               </ul>
-              <button type="button" class="w-100 btn btn-lg btn-primary">Get started</button>
+              <button type="button" class="w-100 btn btn-lg btn-primary">
+                <i class="bi bi-graph-up me-2"></i>View Trends
+              </button>
             </div>
           </div>
         </div>
         <div class="col">
-          <div class="card mb-2.5 rounded-3 shadow-sm border-primary">
+          <div class="card mb-4 rounded-3 shadow-sm weather-card h-100 border-primary">
             <div class="card-header py-3 text-bg-primary border-primary">
-              <h4 class="my-0 fw-normal">Wind Info</h4>
+              <h4 class="my-0 fw-normal">
+                <i class="bi bi-wind me-2"></i>Wind Info
+              </h4>
             </div>
-            <div class="card-body">
-              <h1 class="card-title pricing-card-title"><span id="wind_speed2"> </span> <small class="text-body-secondary fw-light">km/hr</small></h1>
-              <ul class="list-unstyled mt-3 mb-4">
-
-                <li>Wind Speed is <span id="wind_speed"></span></li>
-                <li>Sunrise Time is <span id="sunrise"></span></li>
-                <li>Sunset Time is <span id="sunset"></span></li>
-
+            <div class="card-body d-flex flex-column">
+              <h1 class="card-title pricing-card-title">
+                <span id="wind_speed2">--</span> 
+                <small class="text-body-secondary fw-light">km/hr</small>
+              </h1>
+              <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                <li><i class="bi bi-speedometer2 me-2"></i>Wind Speed: <span id="wind_speed">--</span> km/hr</li>
+                <li><i class="bi bi-sunrise me-2"></i>Sunrise: <span id="sunrise">--</span></li>
+                <li><i class="bi bi-sunset me-2"></i>Sunset: <span id="sunset">--</span></li>
               </ul>
-              <button type="button" class="w-100 btn btn-lg btn-primary"><a href="./contact.html"><h1 style="color: azure"> Contact Me</h1> </a></button> 
-
+              <a href="./contact.html" class="w-100 btn btn-lg btn-primary text-decoration-none">
+                <i class="bi bi-envelope me-2"></i>Contact Me
+              </a>
             </div>
           </div>
         </div>
       </div>
 
-      <h2 class="display-6 text-center mb-4">Weather of other common places </h2>
+      <h2 class="display-6 text-center mb-4">
+        <i class="bi bi-table me-2"></i>Weather Comparison - Other Cities
+      </h2>
+
+      <!-- Dynamic Controls -->
+      <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="bi bi-gear me-2"></i>Comparison Controls
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="addCity" class="form-label">Add City to Comparison:</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="addCity" placeholder="Enter city name">
+                    <button class="btn btn-outline-success" type="button" onclick="addCityToComparison(document.getElementById('addCity').value)">
+                      <i class="bi bi-plus"></i> Add
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Current Cities (<span id="currentCityCount">4</span>/8):</label>
+                  <div id="currentCities" class="d-flex flex-wrap">
+                    <!-- Current cities will be displayed here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="table-responsive">
-        <table class="table text-center">
-          <thead>
+        <table class="table table-hover text-center">
+          <thead class="table-dark">
             <tr>
-              <th style="width: 34%;"></th>
-              <th style="width: 22%;">CLOUD_PCT</th>
-              <th style="width: 22%;">FEELS_LIKE</th>
-              <th style="width: 22%;">HUMIDITY</th>
-              <th style="width: 22%;">MAX_TEMP</th>
-              <th style="width: 22%;">MIN_TEMP</th>
-              <th style="width: 22%;">SUNRISE</th>
-              <th style="width: 22%;">SUNSET</th>
-              <th style="width: 22%;">TEMP</th>
-              <th style="width: 22%;">WIND_DEGREES</th>
-              <th style="width: 22%;">WIND_SPEED</th>
-
+              <th style="width: 15%;">City</th>
+              <th style="width: 8%;">Cloud %</th>
+              <th style="width: 8%;">Feels Like</th>
+              <th style="width: 8%;">Humidity</th>
+              <th style="width: 8%;">Max Temp</th>
+              <th style="width: 8%;">Min Temp</th>
+              <th style="width: 10%;">Sunrise</th>
+              <th style="width: 10%;">Sunset</th>
+              <th style="width: 8%;">Current</th>
+              <th style="width: 8%;">Wind Dir</th>
+              <th style="width: 8%;">Wind Speed</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th scope="row" class="text-start">Oklahoma</th>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-              
-              
-            </tr>
-            <tr>
-              <th scope="row" class="text-start">Hyderabad</th>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-
-            </tr>
-          </tbody>
-
-          <tbody>
-            <tr>
-              <th scope="row" class="text-start">Boston</th>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-            </tr>
-            <tr>
-              <th scope="row" class="text-start">Dallas</th>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-              <td>1</td>
-              <td>2</td>
-              <td>3</td>
-              <td>4</td>
-              <td>5</td>
-            </tr>
-           
+            <!-- Dynamic content will be loaded here -->
           </tbody>
         </table>
       </div>
+
+      <!-- About Section -->
+      <div id="about" class="mt-5">
+        <div class="row">
+          <div class="col-md-8 mx-auto">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="bi bi-info-circle me-2"></i>About This Weather App</h3>
+              </div>
+              <div class="card-body">
+                <p>This weather application provides real-time weather information for cities around the world. It uses the Weather API Ninjas service to fetch accurate and up-to-date weather data.</p>
+                <p><strong>Features:</strong></p>
+                <ul>
+                  <li>Real-time weather data for any city</li>
+                  <li>Temperature, humidity, and wind information</li>
+                  <li>Sunrise and sunset times</li>
+                  <li>Weather comparison across multiple cities</li>
+                  <li>Responsive design for all devices</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage Guide -->
+      <div id="guide" class="mt-5">
+        <div class="row">
+          <div class="col-md-8 mx-auto">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="bi bi-question-circle me-2"></i>Usage Guide</h3>
+              </div>
+              <div class="card-body">
+                <ol>
+                  <li><strong>Search for a city:</strong> Use the search bar in the navigation to find weather for any city</li>
+                  <li><strong>Quick access:</strong> Click on cities in the dropdown menu for instant weather data</li>
+                  <li><strong>Compare cities:</strong> View the comparison table below to see weather across multiple cities</li>
+                  <li><strong>Contact:</strong> Click the "Contact Me" button to get in touch</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
+
+  <footer class="bg-dark text-light text-center py-4 mt-5">
+    <div class="container">
+      <p>&copy; 2024 Weather App. Built with HTML, CSS, and JavaScript.</p>
+      <p>Powered by Weather API Ninjas</p>
+    </div>
+  </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>
